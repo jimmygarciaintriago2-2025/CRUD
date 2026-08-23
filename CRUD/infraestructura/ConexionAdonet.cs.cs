@@ -6,7 +6,7 @@ using Microsoft.Data.SqlClient;
 
 namespace CRUD.infraestructura
 {
-    public class ConexionAdonet
+    public class ConexionAdonet 
     {
         private readonly IConfiguration _configuration;
 
