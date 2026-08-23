@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using CRUD.Repositorio.Alumno;
+using CRUD.repositorio.alumno;
 using CRUD.entidades;
 
 namespace CRUD.Controllers
@@ -19,18 +19,18 @@ namespace CRUD.Controllers
 
         // GET: api/alumnocontroller
         [HttpGet]
-        public async Task<IActionResult> GetPersonas()
+        public IActionResult GetPersonas()
         {
-            var personas = await _alumnoQuery.GetPersonasAsync();
+            var personas = _alumnoQuery.ObtenerTodos();
             return Ok(personas);
         }
 
         // POST: api/alumnocontroller
         [HttpPost]
-        public async Task<IActionResult> CreatePersona([FromBody] Persona dto)
+        public IActionResult CreatePersona([FromBody] Persona persona)
         {
-            var nuevaPersona = await _alumnoCommand.CreatePersonasAsync(dto);
-            return Ok(nuevaPersona);
+            _alumnoCommand.Insertar(persona);
+            return Ok(new { mensaje = "Persona insertada correctamente con ADO.NET" });
         }
     }
 }

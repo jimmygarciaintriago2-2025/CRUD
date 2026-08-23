@@ -1,52 +1,35 @@
-﻿using CRUD.entidades;
-using CRUD.infraestructura.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.Data.SqlClient;
+using CRUD.entidades;
+using CRUD.infraestructura;
 
-namespace CRUD.Repositorio.Alumno
+namespace CRUD.repositorio.alumno
 {
     public class AlumnoCommand
     {
-        private readonly alumnosContext _context;
+        private readonly ConexionAdonet _conexionAdonet;
 
-        public AlumnoCommand(alumnosContext context)
+        public AlumnoCommand(ConexionAdonet conexionAdonet)
         {
-            _context = context;
+            _conexionAdonet = conexionAdonet;
         }
 
-        public async Task<Persona> CreatePersonasAsync(Persona dto)
+        public void Insertar(Persona persona)
         {
-            _context.Persona.Add(dto);
-            await _context.SaveChangesAsync();
-            return dto;
-        }
-
-        public async Task<Persona> UpdatePersonasAsync(Persona dto)
-        {
-            var entity = await _context.Persona.FindAsync(dto.Idpersona);
-
-            if (entity == null)
+            using (var conn = _conexionAdonet.ObtenerConexion())
             {
-                throw new InvalidOperationException("Persona no encontrada");
+                string query = "INSERT INTO personas (nombres, apellidos, cedula, activo) VALUES (@nombres, @apellidos, @cedula, @activo)";
+                using (var cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@nombres", persona.Nombres);
+                    cmd.Parameters.AddWithValue("@apellidos", persona.Apellidos);
+                    cmd.Parameters.AddWithValue("@cedula", persona.Cedula);
+                    cmd.Parameters.AddWithValue("@activo", persona.Activo);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
-
-            entity.Nombres = dto.Nombres;
-            entity.Apellidos = dto.Apellidos;
-            entity.Cedula = dto.Cedula;
-            entity.Activo = dto.Activo;
-
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
-
-        public async Task<bool> DeletePersonaAsync(int id)
-        {
-            var entity = await _context.Persona.FindAsync(id);
-            if (entity == null) return false;
-
-            _context.Persona.Remove(entity);
-            await _context.SaveChangesAsync();
-            return true;
         }
     }
 }
