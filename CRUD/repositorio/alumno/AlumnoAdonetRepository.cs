@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using CRUD.entidades;
@@ -25,9 +25,9 @@ namespace CRUD.repositorio.alumno
                     string query = "INSERT INTO personas (nombres, apellidos, cedula, activo) VALUES (@nombres, @apellidos, @cedula, @activo)";
                     using (var cmd = new SqlCommand(query, conn))
                     {
-                        cmd.Parameters.AddWithValue("@nombres", alumno.Nombres);
-                        cmd.Parameters.AddWithValue("@apellidos", alumno.Apellidos);
-                        cmd.Parameters.AddWithValue("@cedula", alumno.Cedula);
+                        cmd.Parameters.AddWithValue("@nombres", alumno.Nombres ?? "");
+                        cmd.Parameters.AddWithValue("@apellidos", alumno.Apellidos ?? "");
+                        cmd.Parameters.AddWithValue("@cedula", alumno.Cedula ?? "");
                         cmd.Parameters.AddWithValue("@activo", alumno.Activo);
 
                         conn.Open();
@@ -77,6 +77,43 @@ namespace CRUD.repositorio.alumno
             return listaAlumnos;
         }
 
+        public Persona? ObtenerPorId(int id)
+        {
+            Persona? persona = null;
+            try
+            {
+                using (var conn = _conexionAdonet.ObtenerConexion())
+                {
+                    string query = "SELECT idpersonas, nombres, apellidos, cedula, activo FROM personas WHERE idpersonas = @idpersonas";
+                    using (var cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@idpersonas", id);
+                        conn.Open();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                persona = new Persona
+                                {
+                                    Idpersonas = reader.GetInt32(0),
+                                    Nombres = reader.GetString(1),
+                                    Apellidos = reader.GetString(2),
+                                    Cedula = reader.GetString(3),
+                                    Activo = reader.GetBoolean(4)
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al consultar alumno por ID: " + ex.Message);
+                throw;
+            }
+            return persona;
+        }
+
         public void Actualizar(Persona alumno)
         {
             try
@@ -87,9 +124,9 @@ namespace CRUD.repositorio.alumno
                     using (var cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@idpersonas", alumno.Idpersonas);
-                        cmd.Parameters.AddWithValue("@nombres", alumno.Nombres);
-                        cmd.Parameters.AddWithValue("@apellidos", alumno.Apellidos);
-                        cmd.Parameters.AddWithValue("@cedula", alumno.Cedula);
+                        cmd.Parameters.AddWithValue("@nombres", alumno.Nombres ?? "");
+                        cmd.Parameters.AddWithValue("@apellidos", alumno.Apellidos ?? "");
+                        cmd.Parameters.AddWithValue("@cedula", alumno.Cedula ?? "");
                         cmd.Parameters.AddWithValue("@activo", alumno.Activo);
 
                         conn.Open();
@@ -108,9 +145,10 @@ namespace CRUD.repositorio.alumno
         {
             try
             {
+                // Borrado lógico: Cambiar estado a Inactivo (activo = 0)
                 using (var conn = _conexionAdonet.ObtenerConexion())
                 {
-                    string query = "DELETE FROM personas WHERE idpersonas = @idpersonas";
+                    string query = "UPDATE personas SET activo = 0 WHERE idpersonas = @idpersonas";
                     using (var cmd = new SqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("@idpersonas", id);
@@ -122,7 +160,7 @@ namespace CRUD.repositorio.alumno
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error al eliminar alumno con ADO.NET: " + ex.Message);
+                Console.WriteLine("Error al desactivar alumno con ADO.NET: " + ex.Message);
                 throw;
             }
         }

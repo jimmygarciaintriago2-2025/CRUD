@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
 using CRUD.entidades;
@@ -45,9 +45,47 @@ namespace CRUD.repositorio.alumno
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                Console.WriteLine("Error al consultar alumnos: " + ex.Message);
+                throw;
             }
             return lista;
+        }
+
+        public Persona? ObtenerPorId(int id)
+        {
+            Persona? persona = null;
+            try
+            {
+                using (var conn = _conexionAdonet.ObtenerConexion())
+                {
+                    string query = "SELECT idpersonas, nombres, apellidos, cedula, activo FROM personas WHERE idpersonas = @idpersonas";
+                    using (var cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@idpersonas", id);
+                        conn.Open();
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                persona = new Persona
+                                {
+                                    Idpersonas = reader.GetInt32(0),
+                                    Nombres = reader.GetString(1),
+                                    Apellidos = reader.GetString(2),
+                                    Cedula = reader.GetString(3),
+                                    Activo = reader.GetBoolean(4)
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error al obtener persona por ID: " + ex.Message);
+                throw;
+            }
+            return persona;
         }
     }
 }

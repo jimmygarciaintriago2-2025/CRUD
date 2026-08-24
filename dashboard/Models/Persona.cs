@@ -1,4 +1,4 @@
-namespace CRUD.entidades
+namespace dashboard.Models
 {
     public class Persona
     {
@@ -7,5 +7,8 @@ namespace CRUD.entidades
         public string Apellidos { get; set; } = string.Empty;
         public string Cedula { get; set; } = string.Empty;
         public bool Activo { get; set; } = true;
+
+        public string EstadoTexto => Activo ? "Activo" : "Inactivo";
+        public string NombreCompleto => $"{Nombres} {Apellidos}".Trim();
     }
 }

@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="CRUD/CRUD.csproj" />
+  <Project Path="dashboard/dashboard.csproj" Id="d64ca380-4335-4fc9-a9ba-d919a376732d" />
 </Solution>

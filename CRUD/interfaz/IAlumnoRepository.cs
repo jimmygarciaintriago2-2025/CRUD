@@ -1,4 +1,4 @@
-﻿
+
 
 
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ namespace CRUD.interfaz
     {
         void Insertar(Persona alumno);
         List<Persona> ObtenerTodos();
+        Persona? ObtenerPorId(int id);
         void Actualizar(Persona alumno);
         void Eliminar(int id);
     }

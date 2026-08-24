@@ -1,4 +1,4 @@
-﻿
+
 
 
 using Microsoft.Extensions.Configuration;
@@ -17,7 +17,8 @@ namespace CRUD.infraestructura
 
         public SqlConnection ObtenerConexion()
         {
-            string connectionString = _configuration.GetConnectionString("DefaultConnection");
+            string connectionString = _configuration.GetConnectionString("DefaultConnection") 
+                ?? "Server=.\\SQLEXPRESS;Database=ISTPET_DB;Trusted_Connection=True;TrustServerCertificate=True;";
             return new SqlConnection(connectionString);
         }
     }
